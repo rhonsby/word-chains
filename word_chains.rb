@@ -28,11 +28,11 @@ module WordChains
     parents = { source => nil }
 
     until words_to_expand.empty?
-      word = words_to_expand.pop
-      adjacent_words = adjacent_words(word, dict)
+      word = words_to_expand.shift
+      adjacent_words = adjacent_words(word, candidate_words)
 
       adjacent_words.each do |adj_word|
-        unless words_already_expanded.include?(adj_word)
+        unless words_already_expanded.include?(adj_word) || adj_word == word
           words_to_expand << adj_word
           parents[adj_word] = word
           return parents if adj_word == target
@@ -41,7 +41,28 @@ module WordChains
 
       words_already_expanded << word
     end
+
+    nil
+  end
+
+  def build_path_from_breadcrumbs(source, target, parents)
+    path = [] # [, target]
+    current_child = target
+
+    begin
+      path.shift(current_child)
+      current_child = parents[current_child]
+    end until current_child.nil?
+
+    path
+  end
+
+  def find_path(source, target, dictionary)
+    parents = find_chain(source, target, dictionary)
+    build_path_from_breadcrumbs(source, target, parents) if parents
   end
 end
 
-WordChains.adjacent_words('cat', ['lat'])
+dictionary = File.readlines('dictionary.txt').map(&:chomp)
+
+p WordChains.find_path('duck', 'ruby', dictionary)
