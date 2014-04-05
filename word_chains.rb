@@ -29,28 +29,26 @@ module WordChains
 
     until words_to_expand.empty?
       word = words_to_expand.shift
-      adjacent_words = adjacent_words(word, candidate_words)
-
-      adjacent_words.each do |adj_word|
-        unless words_already_expanded.include?(adj_word) || adj_word == word
-          words_to_expand << adj_word
-          parents[adj_word] = word
-          return parents if adj_word == target
-        end
-      end
-
       words_already_expanded << word
+
+      adjacent_words(word, candidate_words).each do |adj_word|
+        next if words_already_expanded.include?(adj_word)
+
+        words_to_expand << adj_word
+        parents[adj_word] = word
+        return parents if adj_word == target
+      end
     end
 
     nil
   end
 
   def build_path_from_breadcrumbs(source, target, parents)
-    path = [] # [, target]
+    path = []
     current_child = target
 
     begin
-      path.shift(current_child)
+      path.unshift(current_child)
       current_child = parents[current_child]
     end until current_child.nil?
 
