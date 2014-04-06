@@ -63,4 +63,12 @@ end
 
 dictionary = File.readlines('dictionary.txt').map(&:chomp)
 
-p WordChains.find_path('duck', 'ruby', dictionary)
+if __FILE__ == $PROGRAM_NAME
+  source = ARGV[0]
+  target = ARGV[1]
+  puts "Loading dictionary..."
+  puts "Building chain..."
+
+  path = WordChains.find_path(source, target, dictionary)
+  puts path
+end
